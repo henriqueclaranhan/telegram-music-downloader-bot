@@ -20,6 +20,10 @@ def recebendoMsg(msg):
 			'to order some music. 🎶', parse_mode= 'Markdown')
 
 	elif userInput.startswith('/music') and userInput[6:]!='':
+		if msg['chat']['type'] == 'group':
+			if '@TLMusicDownloader_bot' in userInput:
+				userInput = userInput.replace('@TLMusicDownloader_bot', '')
+				
 		search = SearchVideos(userInput[6:], offset = 1, mode = "json", max_results = 1)
 		resultados = json.loads(search.result())
 
