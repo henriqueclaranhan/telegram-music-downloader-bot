@@ -26,43 +26,48 @@ def recebendoMsg(msg):
 				
 		search = SearchVideos(userInput[6:], offset = 1, mode = "json", max_results = 1)
 		resultados = json.loads(search.result())
+		duration = resultados['search_result'][0]['duration'].split(':')
 
-		title = resultados['search_result'][0]['title']
-		link = resultados['search_result'][0]['link']
-		#video_id = resultados['search_result'][0]['id']
+		if int(duration[0]) < 30:
+			title = resultados['search_result'][0]['title']
+			link = resultados['search_result'][0]['link']
+			#video_id = resultados['search_result'][0]['id']
 
-		file_name = title +' - '+str(randint(0,999999))+'.mp3'
+			file_name = title +' - '+str(randint(0,999999))+'.mp3'
 
-		ydl_opts = {
-			'outtmpl': './'+file_name,
-			'format': 'bestaudio/best',
-			'postprocessors': [{
-				'key': 'FFmpegExtractAudio',
-				'preferredcodec': 'mp3',
-				'preferredquality': '256',
-			}],
-			'prefer_ffmpeg': True
-		}
+			ydl_opts = {
+				'outtmpl': './'+file_name,
+				'format': 'bestaudio/best',
+				'postprocessors': [{
+					'key': 'FFmpegExtractAudio',
+					'preferredcodec': 'mp3',
+					'preferredquality': '256',
+				}],
+				'prefer_ffmpeg': True
+			}
 
-		bot.sendMessage(chat_id,'🎵 '+title+'\n'+'🔗 '+link)
-		DownloadingMsg = bot.sendMessage(chat_id,'⬇️ Downloading... '
-			'\n_(this may take a while.)_', parse_mode= 'Markdown')
+			bot.sendMessage(chat_id,'🎵 '+title+'\n'+'🔗 '+link)
+			DownloadingMsg = bot.sendMessage(chat_id,'⬇️ Downloading... '
+				'\n_(this may take a while.)_', parse_mode= 'Markdown')
 
-		with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-			info_dict = ydl.extract_info(link, download=True) 
+			with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+				info_dict = ydl.extract_info(link, download=True) 
 
-		bot.sendAudio(chat_id,audio=open(file_name,'rb'))
-		bot.deleteMessage((chat_id, DownloadingMsg['message_id']))
-		bot.sendMessage(chat_id, '✅ Sucess!')
-		print ("Sucess!")
-		os.remove(file_name)
+			bot.sendAudio(chat_id,audio=open(file_name,'rb'))
+			bot.deleteMessage((chat_id, DownloadingMsg['message_id']))
+			bot.sendMessage(chat_id, '✅ Sucess!')
+
+			print ("Sucess!")
+			os.remove(file_name)
+
+		else:
+			bot.sendMessage(chat_id, '‼️ *Oops! Video too long to convert!*\n'
+			'Order something 30 minutes or less.', parse_mode= 'Markdown')
 
 	else:
-		bot.sendMessage(chat_id, '‼️ Oops! Invalid command!\n'
+		bot.sendMessage(chat_id, '‼️ *Oops! Invalid command!*\n'
 			'Try: "*/music* _song name_"\n'
 			'or: "*/music* _musician name - song name_"', parse_mode= 'Markdown')
-		
-bot.message_loop(recebendoMsg)
 
-while True:
-	pass
+
+bot.message_loop(recebendoMsg, run_forever=True)
