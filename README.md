@@ -1,5 +1,5 @@
 # Telegram Music Downloader Bot
-<a href="https://telegram.org/">Telegram</a> to download mp3 from YouTube.
+<a href="https://telegram.org/">Telegram</a> bot to download mp3 from YouTube.
 
 Click <a href="https://t.me/TLMusicDownloader_bot">@TLMusicDownloader_bot</a> to see.
 
