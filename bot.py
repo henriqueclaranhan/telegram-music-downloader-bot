@@ -13,7 +13,7 @@ def recebendoMsg(msg):
 	chat_id = msg['chat']['id']
 
 	if userInput.startswith('/start'):
-		bot.sendMessage(chat_id, '🤖 Hello, '+ msg['chat']['first_name'] +'!\n\n'
+		bot.sendMessage(chat_id, '🤖 Hello, '+ msg['from']['first_name'] +'!\n\n'
 			'📩 Send me:\n\n'
 			'"*/music* _song name_"  or\n'
 			'"*/music* _musician name - song name_"\n\n'
