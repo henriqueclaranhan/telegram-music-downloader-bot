@@ -1,5 +1,4 @@
 import os
-import sys
 import json
 import youtube_dl
 import telepotpro
@@ -7,109 +6,148 @@ from random import randint
 from multiprocessing import Process
 from youtubesearchpython import SearchVideos
 
-
 bot = telepotpro.Bot("API_TOKEN")
 
-def startMsg(chat_id, first_name):
-	bot.sendMessage(chat_id, '🤖 Hello, '+ first_name +'!\n\n'
-	'📩 Send me:\n\n'
-	'"*/music* _song name_"  or\n'
-	'"*/music* _musician name - song name_"\n\n'
-	'to order some music. 🎶', parse_mode= 'Markdown')
+class Music:
+    def __init__(self, user_input, msg):
+        self.chat = Chat
+        self.user_input = user_input[6:]
 
-def errorMsg(chat_id, error_type):
-	if error_type == 'too_long':
-		bot.sendMessage(chat_id, '‼️ *Oops! Video too long to convert!*\n'
-			'Order something 30 minutes or less.', parse_mode= 'Markdown')
+    def search_music(self, user_input):
+        search = SearchVideos(user_input, offset = 1, mode = "json", max_results = 1)
+        
+        return json.loads(search.result())
 
-	if error_type == 'spotify_command':
-		bot.sendMessage(chat_id, "‼️ *Oops! The bot doesn't support Spotify links!*\n"
-			'Try: "*/music* _song name_"\n'
-			'or: "*/music* _musician name - song name_"', parse_mode= 'Markdown')
+        pass
 
-	if error_type == 'invalid_command':
-		bot.sendMessage(chat_id, '‼️ *Oops! Invalid command!*\n'
-			'Try: "*/music* _song name_"\n'
-			'or: "*/music* _musician name - song name_"', parse_mode= 'Markdown')
+    def get_link(self, result):
+        return result['search_result'][0]['link']
 
-def downloadMusic(file_name, link):
-	ydl_opts = {
-		'outtmpl': './'+file_name,
-		'format': 'bestaudio/best',
-		'postprocessors': [{
-			'key': 'FFmpegExtractAudio',
-			'preferredcodec': 'mp3',
-			'preferredquality': '256',
-		}],
-		'prefer_ffmpeg': True
-	}
+        pass
 
-	with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-		info_dict = ydl.extract_info(link, download=True)
+    def get_title(self, result):
+        return result['search_result'][0]['title']
 
-def validMusicInput(userInput, chat_id, chat_type):
-		#Search music on youtube
-		search = SearchVideos(userInput[6:], offset = 1, mode = "json", max_results = 1)
-		resultados = json.loads(search.result())
-		
-		#Get video duration
-		duration = resultados['search_result'][0]['duration'].split(':')
-		splitCount = len(duration)
+        pass
 
-		if int(duration[0]) < 30 and splitCount < 3:
-			title = resultados['search_result'][0]['title']
-			link = resultados['search_result'][0]['link']
-			file_name = title +' - '+str(randint(0,999999))+'.mp3'
+    def get_duration(self, result):
+        result = result['search_result'][0]['duration'].split(':')
+        min_duration = int(result[0])
+        split_count = len(result)
+        
+        return min_duration, split_count
 
-			bot.sendMessage(chat_id,'🎵 '+title+'\n'+'🔗 '+link)
-			DownloadingMsg = bot.sendMessage(chat_id,'⬇️ Downloading... '
-				'\n_(this may take a while.)_', parse_mode= 'Markdown')
+        pass
 
-			#Download the music
-			downloadMusic(file_name, link)
+    def download_music(self, file_name, link):
+        ydl_opts = {
+            'outtmpl': './'+file_name,
+            'format': 'bestaudio/best',
+            'postprocessors': [{
+                'key': 'FFmpegExtractAudio',
+                'preferredcodec': 'mp3',
+                'preferredquality': '256',
+            }],
+            'prefer_ffmpeg': True
+        }
 
-			bot.sendAudio(chat_id,audio=open(file_name,'rb'))
-			bot.deleteMessage((chat_id, DownloadingMsg['message_id']))
-			bot.sendMessage(chat_id, '✅ Sucess!')
+        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+            info_dict = ydl.extract_info(link, download=True)
 
-			print ("Sucess!")
-			os.remove(file_name)
+        pass
 
-		else:
-			errorMsg(chat_id, 'too_long')
+class Chat:
+    def __init__(self, msg):
+        self.chat_id = msg['chat']['id']
+        self.user_input = msg['text']
+        self.user_input = self.user_input.replace('@TLMusicDownloader_bot', '')
+        self.user_name = msg['from']['first_name']
 
-		pass
+        self.messages = {
+            'start':'🤖 Hello, '+ self.user_name +'!\n\n'
+                    '📩 Send me:\n\n'
+                    '"*/music* _song name_"  or\n'
+                    '"*/music* _musician name - song name_"\n\n'
+                    'to order some music. 🎶',
+            
+            'spotify_input_error':"‼️ *Oops! The bot doesn't support Spotify links!*\n"
+                    'Try: "*/music* _song name_"\n'
+                    'or: "*/music* _musician name - song name_"',
 
-def recebendoMsg(msg):
-	userInput = msg['text']
-	chat_id = msg['chat']['id']
-	first_name = msg['from']['first_name']
-	chat_type = msg['chat']['type']
+            'invalid_command':'‼️ *Oops! Invalid command!*\n'
+                    'Try: "*/music* _song name_"\n'
+                    'or: "*/music* _musician name - song name_"',
 
-	if chat_type == 'group':
-		if '@TLMusicDownloader_bot' in userInput:
-			userInput = userInput.replace('@TLMusicDownloader_bot', '')
+            'too_long':'‼️ *Oops! Video too long to convert!*\n'
+                    'Order something 30 minutes or less.'
 
-	if userInput.startswith('/start'):
-		#Shows start dialog
-		startMsg(chat_id, first_name)
 
-	elif userInput.startswith('/music') and userInput[6:]!='':
-		if 'open.spotify.com' in userInput[6:]:
-			errorMsg(chat_id, 'spotify_command')
+        }
 
-		else:
-			#Process the music
-			validMusicInput(userInput, chat_id, chat_type)
+        self.check_input(self.user_input, msg)
 
-	else:
-		#Invalid command
-		errorMsg(chat_id, 'invalid_command')
+        pass
 
-	pass
+    def send_message(self, content):
+        return bot.sendMessage(self.chat_id, content, parse_mode='Markdown')
 
-def main(msg):
-	main_process = Process(target=recebendoMsg, args=(msg,))
-	main_process.start()
+        pass
 
-bot.message_loop(main, run_forever=True)
+    def delete_message(self, message):
+        chat_id = message['chat']['id']
+        message_id = message['message_id']
+        bot.deleteMessage((chat_id, message_id))
+
+        pass
+
+    def send_audio(self, file_name):
+        bot.sendAudio(self.chat_id,audio=open(file_name,'rb'))
+
+        pass
+
+    def process_request(self, user_input):
+        result = Music.search_music(self, user_input[6:])
+        min_duration, split_count = Music.get_duration(self, result)
+
+        if int(min_duration) < 30 and split_count < 3:
+            file_name = Music.get_title(self, result) +' - @TLMusicDownloader_bot '+str(randint(0,999999))+'.mp3'
+            file_name = file_name.replace('"', '')
+
+            self.send_message(['🎵 '+ Music.get_title(self, result) +'\n'+'🔗 '+Music.get_link(self, result)])
+            downloading_message = self.send_message('⬇️ Downloading... \n_(this may take a while.)_')
+
+            Music.download_music(self, file_name, Music.get_link(self, result))
+
+            try:
+                self.send_audio(file_name)
+                self.delete_message(downloading_message)
+                self.send_message('✅ Sucess!')
+                print ("\nSucess!\n")
+            except:
+                print("\nError")
+
+            os.remove(file_name)
+        pass
+
+    def check_input(self, user_input, msg):
+        if user_input.startswith('/start'):
+            self.send_message(self.messages['start'])
+
+        elif user_input.startswith('/music') and user_input[6:]!='':
+            if 'open.spotify.com' in user_input[6:]:
+            	self.send_message(self.messages['spotify_input_error'])
+
+            else:
+                self.process_request(user_input)
+
+        else:
+            #Invalid command
+            self.send_message(self.messages['invalid_command'])
+
+        pass 
+
+def start_new_chat(msg):
+    Process(target=Chat, args=(msg,)).start()
+    
+
+bot.message_loop(start_new_chat, run_forever=True)
