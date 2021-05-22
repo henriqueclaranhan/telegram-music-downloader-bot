@@ -5,8 +5,14 @@ import telepotpro
 from random import randint
 from multiprocessing import Process
 from youtubesearchpython import SearchVideos
+from dotenv import load_dotenv
+from os.path import join, dirname
 
-bot = telepotpro.Bot("API_TOKEN")
+dotenv_path = join(dirname(__file__), '.env')
+load_dotenv(dotenv_path)
+
+TOKEN = os.environ.get("TOKEN")
+bot = telepotpro.Bot(TOKEN)
 
 class Music:
     def __init__(self, user_input, msg):

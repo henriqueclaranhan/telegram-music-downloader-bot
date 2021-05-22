@@ -10,7 +10,7 @@
   "website": "https://github.com/henriqueclaranhan/telegram-music-downloader-bot",
   "success_url": "https://t.me/tlmusicdownloader_bot",
   "env": {
-    "TELEGRAM_API": {
+    "TOKEN": {
       "description": "Make a bot at BotFather http://telegram.dog/BotFather and get the token of your bot",
       "value": "",
       "required": true
