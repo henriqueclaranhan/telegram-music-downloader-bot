@@ -62,6 +62,7 @@ class Chat:
         self.user_input = msg['text']
         self.user_input = self.user_input.replace('@TLMusicDownloader_bot', '')
         self.user_name = msg['from']['first_name']
+        self.message_id = msg['message_id']
 
         self.messages = {
             'start':'🤖 Hello, '+ self.user_name +'!\n\n'
@@ -89,7 +90,7 @@ class Chat:
         pass
 
     def send_message(self, content):
-        return bot.sendMessage(self.chat_id, content, parse_mode='Markdown')
+        return bot.sendMessage(self.chat_id, content, reply_to_message_id=self.message_id, parse_mode='Markdown')
 
         pass
 
@@ -101,7 +102,7 @@ class Chat:
         pass
 
     def send_audio(self, file_name):
-        bot.sendAudio(self.chat_id,audio=open(file_name,'rb'))
+        bot.sendAudio(self.chat_id,audio=open(file_name,'rb'), reply_to_message_id=self.message_id)
 
         pass
 
