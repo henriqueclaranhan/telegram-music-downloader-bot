@@ -1,6 +1,7 @@
 {
   "name": "telegram-music-downloader-bot",
   "description": "YouTube Music Downloader Bot for Telegram. ",
+	"stack": "container",
   "repository": "https://github.com/henriqueclaranhan/telegram-music-downloader-bot",
   "keywords": [
   "python", 
@@ -15,11 +16,5 @@
       "value": "",
       "required": true
     }
-  },
-  "buildpacks": [
-  	{
-  		"url": "https://github.com/jonathanong/heroku-buildpack-ffmpeg-latest.git",
-  		"url": "heroku/python"
-  	}
-  ]
+  }
 }
