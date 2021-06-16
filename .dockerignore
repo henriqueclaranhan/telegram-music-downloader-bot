@@ -1,0 +1,4 @@
+README.md
+.git/
+__pycache__/
+sample.env

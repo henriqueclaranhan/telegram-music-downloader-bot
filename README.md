@@ -19,6 +19,14 @@ Click <a href="https://t.me/TLMusicDownloader_bot">@TLMusicDownloader_bot</a> to
  
         pip3 install youtube-search-python
 
+ - Insert your token in the .env file
+ 
+        mv sample.env .env
+
+## Deploy on Heroku
+
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+
 
 ## Screenshot
 <img src="https://user-images.githubusercontent.com/58452863/93033272-91392e80-f603-11ea-9aae-8183131cefd1.png" alt="Screenshot" width="380" height="600">
