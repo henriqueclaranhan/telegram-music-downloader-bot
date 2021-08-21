@@ -1,10 +1,9 @@
 import os
-import json
 import youtube_dl
 import telepotpro
 from random import randint
 from multiprocessing import Process
-from youtubesearchpython import SearchVideos
+from youtubesearchpython import VideosSearch
 from dotenv import load_dotenv
 from os.path import join, dirname
 
@@ -20,24 +19,22 @@ class Music:
         self.user_input = user_input[6:]
 
     def search_music(self, user_input):
-        search = SearchVideos(user_input, offset = 1, mode = "json", max_results = 1)
+        return VideosSearch(user_input, limit = 1).result()
         
-        return json.loads(search.result())
-
         pass
 
     def get_link(self, result):
-        return result['search_result'][0]['link']
+        return result['result'][0]['link']
 
         pass
 
     def get_title(self, result):
-        return result['search_result'][0]['title']
+        return result['result'][0]['title']
 
         pass
 
     def get_duration(self, result):
-        result = result['search_result'][0]['duration'].split(':')
+        result = result['result'][0]['duration'].split(':')
         min_duration = int(result[0])
         split_count = len(result)
         
@@ -114,6 +111,7 @@ class Chat:
 
     def process_request(self, user_input):
         result = Music.search_music(self, user_input[6:])
+
         min_duration, split_count = Music.get_duration(self, result)
 
         if int(min_duration) < 30 and split_count < 3:
