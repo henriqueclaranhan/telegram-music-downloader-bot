@@ -20,18 +20,12 @@ class Music:
 
     def search_music(self, user_input):
         return VideosSearch(user_input, limit = 1).result()
-        
-        pass
 
     def get_link(self, result):
         return result['result'][0]['link']
 
-        pass
-
     def get_title(self, result):
         return result['result'][0]['title']
-
-        pass
 
     def get_duration(self, result):
         result = result['result'][0]['duration'].split(':')
@@ -39,8 +33,6 @@ class Music:
         split_count = len(result)
         
         return min_duration, split_count
-
-        pass
 
     def download_music(self, file_name, link):
         ydl_opts = {
@@ -95,8 +87,6 @@ class Chat:
     def send_message(self, content):
         return bot.sendMessage(self.chat_id, content, reply_to_message_id=self.message_id, parse_mode='Markdown')
 
-        pass
-
     def delete_message(self, message):
         chat_id = message['chat']['id']
         message_id = message['message_id']
@@ -143,6 +133,7 @@ class Chat:
             	self.send_message(self.messages['spotify_input_error'])
 
             else:
+                #Valid command
                 self.process_request(user_input)
 
         else:
