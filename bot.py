@@ -130,7 +130,7 @@ class Chat:
 
         elif user_input.startswith('/music') and user_input[6:]!='':
             if 'open.spotify.com' in user_input[6:]:
-            	self.send_message(self.messages['spotify_input_error'])
+                self.send_message(self.messages['spotify_input_error'])
 
             else:
                 #Valid command
