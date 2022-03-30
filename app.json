@@ -2,7 +2,7 @@
   "name": "telegram-music-downloader-bot",
   "description": "YouTube Music Downloader Bot for Telegram. ",
 	"stack": "container",
-  "repository": "https://github.com/adisuvi/telegram-music-downloader-bot",
+  "repository": "https://github.com/amasuvi/telegram-music-downloader-bot",
   "keywords": [
   "python", 
   "chatbot", 
